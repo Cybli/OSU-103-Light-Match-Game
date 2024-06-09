@@ -14,6 +14,7 @@ int r;
 int g;
 int b;
 int RandNum;
+bool Boot = true;
 bool Starting = true;
 bool SwitchState;
 volatile bool Lbuttonflag = false;
@@ -33,7 +34,8 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(LButtonPin), LbuttonISR, FALLING);
   attachInterrupt(digitalPinToInterrupt(RButtonPin), RbuttonISR, FALLING);
   attachInterrupt(digitalPinToInterrupt(SwitchPin), switchISR, CHANGE);
-  srandom(time(0));
+  randomSeed(analogRead(0));
+  SwitchState = CircuitPlayground.slideSwitch();
 }
 
 void switchISR(){
@@ -96,20 +98,35 @@ if(HP == 2){
     CircuitPlayground.setPixelColor(9, 0, 0, 0);
     CircuitPlayground.setPixelColor(8, 0, 0, 0);
   } else if(HP = -1){
+    Serial.println("Score: ");
+    Serial.println(Score);
     for(int i = 3; i>= 0; i--){
     for(int i=10; i>=0; i--) {
     CircuitPlayground.setPixelColor(i, 255, 0, 0);
   }
-    Serial.println("Score: ");
-    Serial.print(Score);
   delay(500);
   CircuitPlayground.clearPixels();
    delay(500);
     }
     //PLay game over sound
     HP = 2;
+    Score = 0;
     Rbuttonflag = true;
     Starting = true;
+    Boot = true;
+  }
+}
+
+///Delay Logic///
+void delayRamp(){
+  if(Score >= 0 && Score <= 5){
+    delay(300);
+  }else if(Score > 5 && Score <= 10){
+    delay(250);
+  }else if(Score > 10 && Score <= 20){
+    delay(200);
+  }else if(Score > 20 && Score <= 30){
+    delay(150);
   }
 }
 
@@ -163,8 +180,7 @@ for(int i=6; i>2; i--) {
     if(i != 6){
     CircuitPlayground.setPixelColor(i + 1, 0, 0, 0);
     }
-   // delay(250 % (DiffScale/2);
-   delay(300);
+    delayRamp();
 
     Pos--;
   }
@@ -177,7 +193,7 @@ if(Pos == 2){
   
   } else {
     HP = HP - 1;
-    delay(300);
+    delayRamp();
     for(int i=1; i>=0; i--) {
     buttoncheck();
     CircuitPlayground.setPixelColor(i, r, g, b);
@@ -185,7 +201,7 @@ if(Pos == 2){
     CircuitPlayground.setPixelColor(i + 1, 0, 0, 0);
     }
     //delay(250 % DiffScale);
-    delay(300);
+    delayRamp();
     }
     Starting = true;
     
